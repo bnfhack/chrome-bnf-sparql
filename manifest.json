@@ -1,0 +1,20 @@
+{
+  "manifest_version": 2,
+
+  "name": "DataBnF Sparqlit Extension",
+  "description": "This extension adds extra links to data.bnf.fr pages to prepare SPARQL queries",
+  "version": "1.0",
+  "content_scripts": [
+    {
+      "matches": ["http://data.bnf.fr/*"],
+      "js": ["sparql-it.js"]
+    }
+  ],
+  "browser_action": {
+    "default_icon": "icon.png"
+  },
+  "permissions": [
+      "tabs", "http://data.bnf.fr/*",
+      "activeTab"
+  ]
+}
