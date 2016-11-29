@@ -14,7 +14,6 @@
     "default_icon": "icon.png"
   },
   "permissions": [
-      "tabs", "http://data.bnf.fr/*",
       "activeTab"
   ]
 }
