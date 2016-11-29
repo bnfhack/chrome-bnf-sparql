@@ -23,7 +23,11 @@ SELECT DISTINCT ?manif ?title ?date WHERE {
     const a = document.createElement('a');
     a.className = 'sparql-link';
     a.href = `http://data.bnf.fr/sparql?query=${encodeURIComponent(authorDocsQuery)}&format=${encodeURIComponent('text/html')}`;
-    a.textContent = 'SPARQL-it!'
+    const img = document.createElement('img');
+    img.src = 'http://data.bnf.fr/data/rdf.png';
+    a.appendChild(img);
+    a.appendChild(document.createTextNode('SPARQL-it!'));
+    a.target = '_blank';
     return a;
 }
 

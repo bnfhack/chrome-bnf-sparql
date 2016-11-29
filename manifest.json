@@ -7,6 +7,7 @@
   "content_scripts": [
     {
       "matches": ["http://data.bnf.fr/*"],
+      "css": ["sparql-it.css"],
       "js": ["sparql-it.js"]
     }
   ],
