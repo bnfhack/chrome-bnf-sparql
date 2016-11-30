@@ -19,7 +19,7 @@ PREFIX rdarelationships: <http://rdvocab.info/RDARelationshipsWEMI/>
 PREFIX dcterms: <http://purl.org/dc/terms/>
 
 
-SELECT DISTINCT ?manif ?title ?date WHERE {
+SELECT DISTINCT ?manif ?title ?date ?type WHERE {
 
   ?expr bnfroles:${role} <${authorUri}#foaf:Person>.
   ?formerexpr owl:sameAs ?expr.
@@ -28,6 +28,10 @@ SELECT DISTINCT ?manif ?title ?date WHERE {
 
   OPTIONAL {
     ?manif dcterms:date ?date.
+  }
+
+  OPTIONAL {
+    ?formerexpr dcterms:type ?type.
   }
 
 }`;
