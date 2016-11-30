@@ -38,8 +38,30 @@ SELECT DISTINCT ?manif ?title ?date ?type WHERE {
 
 }
 
+function workDocsQuery(workUri) {
+    return `
+PREFIX rdarelationships: <http://rdvocab.info/RDARelationshipsWEMI/>
+PREFIX dcterms: <http://purl.org/dc/terms/>
 
-function hackDocumentSections(authorUri) {
+
+SELECT DISTINCT ?manif ?title ?date ?type WHERE {
+
+  ?manif rdarelationships:workManifested <${workUri}#frbr:Work> ;
+         rdarelationships:expressionManifested ?formerexpr ;
+         dcterms:title ?title
+
+  OPTIONAL {
+    ?manif dcterms:date ?date.
+  }
+
+  OPTIONAL {
+    ?formerexpr dcterms:type ?type.
+  }
+}`;
+}
+
+
+function hackAuthorDocumentSections(authorUri) {
     Array.from(document.querySelectorAll('.dtmanifs > h3 > a:first-child')).forEach(link => {
         const role = link.href.split('/').pop();
         const h3 = link.parentElement;
@@ -49,12 +71,37 @@ function hackDocumentSections(authorUri) {
 
 
 function hackAuthorPage(pageUri) {
-    hackDocumentSections(pageUri);
+    hackAuthorDocumentSections(pageUri);
 }
 
 
+function hackWorkDocumentSections(workUri) {
+    Array.from(document.querySelectorAll('.dtmanifs > h3')).forEach(h3 => {
+        h3.insertBefore(sparqlLink(workDocsQuery(workUri)), h3.firstChild);
+    });
+}
 
-if (document.querySelector('meta[property="og:type"]').content === 'author') {
-    const pageUri = document.querySelector('link[rel=bookmark]').href;
+
+function hackWorkPage(pageUri) {
+    hackWorkDocumentSections(pageUri);
+}
+
+
+function guessPageType() {
+    const ogtype = document.querySelector('meta[property="og:type"]');
+    if (ogtype !== null) {
+        return ogtype.content;
+    }
+}
+
+
+let pageUri = document.querySelector('link[rel=bookmark]').href;
+
+switch(guessPageType()) {
+case 'author':
     hackAuthorPage(pageUri);
+    break;
+case 'book':
+    hackWorkPage(pageUri);
+    break;
 }
