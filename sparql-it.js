@@ -64,6 +64,31 @@ SELECT DISTINCT ?manif ?title ?date ?type WHERE {
 }
 
 
+function relatedAuthorsQuery(authorUri) {
+    return `
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX bnfroles: <http://data.bnf.fr/vocabulary/roles/>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+
+SELECT ?role1 ?manif ?title ?role2 ?author2 ?author2name WHERE {
+  ?expr dcterms:contributor <${authorUri}#foaf:Person> ;
+        ?role1 <${authorUri}#foaf:Person> ;
+        ?role2 ?author2.
+
+  ?author2 a foaf:Person;
+       foaf:name ?author2name.
+
+  ?formerexpr owl:sameAs ?expr.
+  ?manif rdarelationships:expressionManifested ?formerexpr ;
+         dcterms:title ?title.
+
+  FILTER(regex(?role1, 'http://data.bnf.fr/vocabulary/roles'))
+  FILTER(regex(?role2, 'http://data.bnf.fr/vocabulary/roles'))
+  FILTER(?author2 != <${authorUri}#foaf:Person>)
+}`;
+}
+
+
 function hackAuthorDocumentSections(authorUri) {
     Array.from(document.querySelectorAll('.dtmanifs > h3 > a:first-child')).forEach(link => {
         const role = link.href.split('/').pop();
@@ -73,8 +98,15 @@ function hackAuthorDocumentSections(authorUri) {
 }
 
 
+function hackRelatedAuthors(authorUri) {
+    Array.from(document.querySelectorAll(`.bloc-contenu a[href="http://data.bnf.fr/linked-authors/${authorUri.slice(32, 40)}"]`)).forEach(a => {
+        a.parentElement.insertBefore(sparqlLink(relatedAuthorsQuery(authorUri)), a);
+    });
+}
+
 function hackAuthorPage(pageUri) {
     hackAuthorDocumentSections(pageUri);
+    hackRelatedAuthors(pageUri);
 }
 
 
