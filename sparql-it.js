@@ -19,12 +19,16 @@ PREFIX rdarelationships: <http://rdvocab.info/RDARelationshipsWEMI/>
 PREFIX dcterms: <http://purl.org/dc/terms/>
 
 
-SELECT DISTINCT ?manif ?title ?date ?type WHERE {
+SELECT DISTINCT ?manif ?work ?title ?date ?type WHERE {
 
-  ?expr bnfroles:${role} <${authorUri}#foaf:Person>.
+  ?expr dcterms:contributor <:${role} <${authorUri}#foaf:Person>.
   ?formerexpr owl:sameAs ?expr.
   ?manif rdarelationships:expressionManifested ?formerexpr ;
          dcterms:title ?title
+
+  OPTIONAL {
+    ?manif rdarelationships:workManifested ?work.
+  }
 
   OPTIONAL {
     ?manif dcterms:date ?date.
@@ -35,7 +39,6 @@ SELECT DISTINCT ?manif ?title ?date ?type WHERE {
   }
 
 }`;
-
 }
 
 function workDocsQuery(workUri) {
