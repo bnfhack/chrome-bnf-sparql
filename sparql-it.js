@@ -1,3 +1,6 @@
+function qsa(selector) {
+    return Array.from(document.querySelectorAll(selector));
+}
 
 function sparqlLink(query) {
     const a = document.createElement('a');
@@ -90,7 +93,7 @@ SELECT ?role1 ?manif ?title ?role2 ?author2 ?author2name WHERE {
 
 
 function hackAuthorDocumentSections(authorUri) {
-    Array.from(document.querySelectorAll('.dtmanifs > h3 > a:first-child')).forEach(link => {
+    qsa('.dtmanifs > h3 > a:first-child').forEach(link => {
         const role = link.href.split('/').pop();
         const h3 = link.parentElement;
         h3.insertBefore(sparqlLink(authorDocsQuery(role, authorUri)), link);
@@ -99,7 +102,7 @@ function hackAuthorDocumentSections(authorUri) {
 
 
 function hackRelatedAuthors(authorUri) {
-    Array.from(document.querySelectorAll(`.bloc-contenu a[href="http://data.bnf.fr/linked-authors/${authorUri.slice(32, 40)}"]`)).forEach(a => {
+    qsa(`.bloc-contenu a[href="http://data.bnf.fr/linked-authors/${authorUri.slice(32, 40)}"]`).forEach(a => {
         a.parentElement.insertBefore(sparqlLink(relatedAuthorsQuery(authorUri)), a);
     });
 }
@@ -111,7 +114,7 @@ function hackAuthorPage(pageUri) {
 
 
 function hackWorkDocumentSections(workUri) {
-    Array.from(document.querySelectorAll('.dtmanifs > h3')).forEach(h3 => {
+    qsa('.dtmanifs > h3').forEach(h3 => {
         h3.insertBefore(sparqlLink(workDocsQuery(workUri)), h3.firstChild);
     });
 }
