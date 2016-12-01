@@ -2,10 +2,17 @@ function qsa(selector) {
     return Array.from(document.querySelectorAll(selector));
 }
 
-function sparqlLink(query) {
+
+function sparqlUrl(query, mimetype) {
+    return `http://data.bnf.fr/sparql?query=${encodeURIComponent(query)}&format=${encodeURIComponent(mimetype || 'text/html')}`;
+}
+
+
+function executeQueryLink(query) {
     const a = document.createElement('a');
     a.className = 'sparql-link';
-    a.href = `http://data.bnf.fr/sparql?query=${encodeURIComponent(query)}&format=${encodeURIComponent('text/html')}`;
+    a.title = 'Execute Query';
+    a.href = sparqlUrl(query);
     const img = document.createElement('img');
     img.src = 'http://data.bnf.fr/data/rdf.png';
     a.appendChild(img);
@@ -14,6 +21,37 @@ function sparqlLink(query) {
     return a;
 }
 
+
+function resultsQueryLink(query) {
+    const a = document.createElement('a');
+    a.className = 'sparql-link';
+    a.title = 'download results';
+    a.href = sparqlUrl(query, 'application/sparql-results+json');
+    a.appendChild(document.createTextNode('[json]'));
+    a.target = '_blank';
+    return a;
+}
+
+
+function openQueryLink(query) {
+    const a = document.createElement('a');
+    a.className = 'sparql sparql-openlink';
+    a.title = 'Open Query Editor';
+    a.href = `http://data.bnf.fr/sparql`;
+    a.onclick = () => storeQuery(query);
+    a.appendChild(document.createTextNode('[editor]'));
+    a.target = '_blank';
+    return a;
+}
+
+function sparqlLink(query) {
+    const span = document.createElement('span')
+    span.className = 'sparql-it';
+    span.appendChild(executeQueryLink(query));
+    span.appendChild(resultsQueryLink(query));
+    span.appendChild(openQueryLink(query));
+    return span;
+}
 
 function authorDocsQuery(role, authorUri) {
     return `
