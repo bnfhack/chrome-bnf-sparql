@@ -1,4 +1,7 @@
-.dtmanifs > h3 > a.sparql-link {
-  color: black;
+.sparql-it a.sparql-link {
   padding-right: 1em;
+}
+
+.sparql-it a {
+  color: black;
 }

@@ -3,6 +3,11 @@ function qsa(selector) {
 }
 
 
+function insertBefore(newNode, target) {
+    target.parentElement.insertBefore(newNode, target);
+}
+
+
 function sparqlUrl(query, mimetype) {
     return `http://data.bnf.fr/sparql?query=${encodeURIComponent(query)}&format=${encodeURIComponent(mimetype || 'text/html')}`;
 }
@@ -130,6 +135,39 @@ SELECT ?role1 ?manif ?title ?role2 ?author2 ?author2name WHERE {
 }
 
 
+function placesQuery() {
+    return `
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX geo: <http://www.w3.org/2003/01/geo/wgs84_pos#>
+
+SELECT ?geo ?label ?lat ?lng ?geonames WHERE {
+
+  ?geoconcept skos:closeMatch ?rameau ;
+    skos:prefLabel ?label ;
+    foaf:focus ?geo.
+
+  OPTIONAL {
+    ?geoconcept skos:exactMatch ?geonames.
+    FILTER(regex(?geonames, 'http://sws.geonames.org/'))
+  }
+
+  ?geo geo:lat ?lat ;
+       geo:long ?lng.
+
+  ?rameau a skos:Concept.
+}
+`;
+}
+
+
+function storeQuery(query) {
+    if (window.localStorage !== undefined) {
+        localStorage.setItem('queryVal_main', JSON.stringify({val: query}));
+    }
+}
+
+
 function hackAuthorDocumentSections(authorUri) {
     qsa('.dtmanifs > h3 > a:first-child').forEach(link => {
         const role = link.href.split('/').pop();
@@ -141,7 +179,7 @@ function hackAuthorDocumentSections(authorUri) {
 
 function hackRelatedAuthors(authorUri) {
     qsa(`.bloc-contenu a[href="http://data.bnf.fr/linked-authors/${authorUri.slice(32, 40)}"]`).forEach(a => {
-        a.parentElement.insertBefore(sparqlLink(relatedAuthorsQuery(authorUri)), a);
+        insertBefore(sparqlLink(relatedAuthorsQuery(authorUri)), a);
     });
 }
 
@@ -163,15 +201,20 @@ function hackWorkPage(pageUri) {
 }
 
 
-function guessPageType() {
-    const ogtype = document.querySelector('meta[property="og:type"]');
-    if (ogtype !== null) {
-        return ogtype.content;
-    }
+function hackHomePage() {
+    const mapBlock = document.querySelector('#map-geo');
+    insertBefore(sparqlLink(placesQuery()), mapBlock);
 }
 
 
-let pageUri = document.querySelector('link[rel=bookmark]').href;
+function guessPageType() {
+    const ogtype = document.querySelector('meta[property="og:type"]');
+    return ogtype ? ogtype.content : null;
+}
+
+
+let permalink = document.querySelector('link[rel=bookmark]'),
+    pageUri = (permalink === null) ? null : permalink.href;
 
 switch(guessPageType()) {
 case 'author':
@@ -180,4 +223,8 @@ case 'author':
 case 'book':
     hackWorkPage(pageUri);
     break;
+case null:
+    if (document.location.pathname === '/') {
+        hackHomePage();
+    }
 }
