@@ -65,15 +65,18 @@ PREFIX rdarelationships: <http://rdvocab.info/RDARelationshipsWEMI/>
 PREFIX dcterms: <http://purl.org/dc/terms/>
 
 
-SELECT DISTINCT ?manif ?work ?title ?date ?type WHERE {
+SELECT DISTINCT ?manif ?work ?title ?date ?type ?gallica WHERE {
 
   ?expr bnfroles:${role} <${authorUri}#foaf:Person>.
   ?formerexpr owl:sameAs ?expr.
   ?manif rdarelationships:expressionManifested ?formerexpr ;
          dcterms:title ?title
-
   OPTIONAL {
     ?manif rdarelationships:workManifested ?work.
+  }
+
+  OPTIONAL {
+    ?manif rdarelationships:electronicReproduction ?gallica.
   }
 
   OPTIONAL {
@@ -93,11 +96,15 @@ PREFIX rdarelationships: <http://rdvocab.info/RDARelationshipsWEMI/>
 PREFIX dcterms: <http://purl.org/dc/terms/>
 
 
-SELECT DISTINCT ?manif ?title ?date ?type WHERE {
+SELECT DISTINCT ?manif ?title ?date ?type ?gallica WHERE {
 
   ?manif rdarelationships:workManifested <${workUri}#frbr:Work> ;
          rdarelationships:expressionManifested ?formerexpr ;
          dcterms:title ?title
+
+  OPTIONAL {
+    ?manif rdarelationships:electronicReproduction ?gallica.
+  }
 
   OPTIONAL {
     ?manif dcterms:date ?date.
