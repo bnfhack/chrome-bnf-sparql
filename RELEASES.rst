@@ -2,6 +2,13 @@
  Relase Notes
 ==============
 
+0.1.0
+=====
+
+Replace the 3 inserted links (execute, download, edit) by a single
+one that opens a modal dialog, displays the query and provides
+access to those 3 actions.
+
 
 0.0.1
 =====

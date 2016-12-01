@@ -3,7 +3,7 @@
 
   "name": "DataBnF Sparqlit Extension",
   "description": "This extension adds extra links to data.bnf.fr pages to prepare SPARQL queries",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "content_scripts": [
     {
       "matches": ["http://data.bnf.fr/*"],
