@@ -62,7 +62,7 @@ PREFIX dcterms: <http://purl.org/dc/terms/>
 
 SELECT DISTINCT ?manif ?work ?title ?date ?type WHERE {
 
-  ?expr dcterms:contributor <:${role} <${authorUri}#foaf:Person>.
+  ?expr bnfroles:${role} <${authorUri}#foaf:Person>.
   ?formerexpr owl:sameAs ?expr.
   ?manif rdarelationships:expressionManifested ?formerexpr ;
          dcterms:title ?title
