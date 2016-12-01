@@ -8,7 +8,7 @@
     {
       "matches": ["http://data.bnf.fr/*"],
       "css": ["sparql-it.css"],
-      "js": ["sparql-it.js"]
+      "js": ["crel.min.js", "sparql-it.js"]
     }
   ],
   "browser_action": {

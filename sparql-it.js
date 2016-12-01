@@ -1,3 +1,7 @@
+/* global crel */
+
+let MODAL;
+
 function qsa(selector) {
     return Array.from(document.querySelectorAll(selector));
 }
@@ -8,55 +12,78 @@ function insertBefore(newNode, target) {
 }
 
 
+function buildModal() {
+    let closeBtn1, closeBtn2;
+    const modalNode = crel(
+        'div', {id: 'sparqlit-modal',
+                'class': 'modal fade',
+                tabindex: -1,
+                role: 'dialog',
+                'aria-labelledby': 'Sparql-it Modal Dialog'},
+        crel('div', {'class': 'modal-dialog', role: 'document'},
+             crel('div', {'class': 'modal-content'},
+                  crel('div', {'class': 'modal-header'},
+                       closeBtn1 = crel('button', {type: 'button',
+                                                   'class': 'close',
+                                                   'data-dismiss': 'modal',
+                                                   'arial-label': 'Close'},
+                                        crel('span', {'aria-hidden': true}, 'x')),
+                       crel('h4', {'class': 'modal-title',
+                                   'id': 'sparql-modal-title'},
+                            'SPARQL-it !')),
+                  crel('div', {'class': 'modal-body'},
+                       crel('pre', {id: 'sparqlit-modal-pre'})),
+                  crel('div', {'class': 'modal-footer'},
+                       crel('a', {'class': 'btn btn-info',
+                                  id: 'sparqlit-modal-exec',
+                                  href: '#',
+                                  target: '_blank'}, 'Execute'),
+                       crel('a', {'class': 'btn btn-info',
+                                  id: 'sparqlit-modal-edit',
+                                  href: 'http://data.bnf.fr/sparql',
+                                  target: '_blank'}, 'Edit'),
+                       crel('a', {'class': 'btn btn-info',
+                                  id: 'sparqlit-modal-dl',
+                                  href: '#',
+                                  target: '_blank'}, 'Download (JSON)'),
+                       closeBtn2 = crel('button', {type: 'button',
+                                                   'class': 'btn btn-default',
+                                                   'data-dismiss': 'modal'},
+                                        'Close')))));
+    closeBtn1.onclick = hideModal;
+    closeBtn2.onclick = hideModal;
+    return modalNode;
+}
+
+
+function modalBackdrop() {
+    return crel('div', {'id': 'sparqlit-modal-backdrop',
+                        'class': 'modal-backdrop fade'});
+}
+
+
 function sparqlUrl(query, mimetype) {
     return `http://data.bnf.fr/sparql?query=${encodeURIComponent(query)}&format=${encodeURIComponent(mimetype || 'text/html')}`;
 }
 
 
 function executeQueryLink(query) {
-    const a = document.createElement('a');
-    a.className = 'sparql-link';
-    a.title = 'Execute Query';
-    a.href = sparqlUrl(query);
-    const img = document.createElement('img');
-    img.src = 'http://data.bnf.fr/data/rdf.png';
-    a.appendChild(img);
-    a.appendChild(document.createTextNode('SPARQL-it!'));
-    a.target = '_blank';
+    const a = crel('a', {'class': 'sparql-link',
+                         target: '_blank',
+                         title: 'Execute Query',
+                         href: '#'},
+                   crel('i', {'class': 'glyphicon glyphicon-search'}),
+                   'SPARQL-it');
+    a.onclick = (evt) => {showModal(query); evt.preventDefault();};
     return a;
 }
 
-
-function resultsQueryLink(query) {
-    const a = document.createElement('a');
-    a.className = 'sparql-link';
-    a.title = 'download results';
-    a.href = sparqlUrl(query, 'application/sparql-results+json');
-    a.appendChild(document.createTextNode('[json]'));
-    a.target = '_blank';
-    return a;
-}
-
-
-function openQueryLink(query) {
-    const a = document.createElement('a');
-    a.className = 'sparql sparql-openlink';
-    a.title = 'Open Query Editor';
-    a.href = `http://data.bnf.fr/sparql`;
-    a.onclick = () => storeQuery(query);
-    a.appendChild(document.createTextNode('[editor]'));
-    a.target = '_blank';
-    return a;
-}
 
 function sparqlLink(query) {
-    const span = document.createElement('span')
-    span.className = 'sparql-it';
-    span.appendChild(executeQueryLink(query));
-    span.appendChild(resultsQueryLink(query));
-    span.appendChild(openQueryLink(query));
-    return span;
+    return crel('span', {'class': 'sparql-it'},
+                executeQueryLink(query));
 }
+
 
 function authorDocsQuery(role, authorUri) {
     return `
@@ -217,6 +244,32 @@ function hackHomePage() {
 function guessPageType() {
     const ogtype = document.querySelector('meta[property="og:type"]');
     return ogtype ? ogtype.content : null;
+}
+
+
+
+function showModal(query) {
+    if (!MODAL) {
+        MODAL = buildModal();
+        document.body.appendChild(MODAL);
+    }
+    const backdrop = modalBackdrop();
+    document.body.appendChild(backdrop);
+    backdrop.classList.add('in');
+    MODAL.style.display = 'block';
+    MODAL.classList.add('fade', 'in');
+    MODAL.querySelector('#sparqlit-modal-pre').textContent = query;
+    MODAL.querySelector('#sparqlit-modal-exec').href = sparqlUrl(query);
+    MODAL.querySelector('#sparqlit-modal-dl').href = sparqlUrl(query, 'application/sparql-results+json');
+    MODAL.querySelector('#sparqlit-modal-edit').onclick = () => storeQuery(query);
+}
+
+
+function hideModal() {
+    const backdrop = document.querySelector('#sparqlit-modal-backdrop');
+    backdrop.parentNode.removeChild(backdrop);
+    MODAL.classList.remove('fade', 'in');
+    MODAL.style.display = 'none';
 }
 
 
