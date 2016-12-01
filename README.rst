@@ -52,3 +52,34 @@ Local installation
 6. select the directory created at step 1
 
 7. go to http://data.bnf.fr and enjoy!
+
+
+Firefox installation
+--------------------
+
+Thanks to WebExtensions_, since the code is pretty straightforward at this point,
+the plugin can also be installed in Firefox:
+
+1. clone the repository or download an archive and unzip it
+
+2. open firefox
+
+3. in the url location bar, type ``about:debugging``
+
+4. check ``Load Temporary Add-on``
+
+5. select the ``manifest.json`` file in the directory created at step 1
+
+6. go to http://data.bnf.fr and enjoy!
+
+
+
+.. _WebExtensions: https://developer.mozilla.org/fr/Add-ons/WebExtensions
+
+
+Installation trhough {Mozilla,Chrome} web store
+===============================================
+
+Not available yet.
+
+
