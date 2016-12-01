@@ -1,7 +1,4 @@
-.sparql-it a.sparql-link {
-  padding-right: 1em;
-}
-
-.sparql-it a {
-  color: black;
+.sparql-link {
+  padding: 0 1em;
+  color: red;
 }
