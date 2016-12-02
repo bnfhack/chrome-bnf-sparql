@@ -325,10 +325,23 @@ function hackStudiesSection(pageUri) {
 }
 
 
+function hackGeoDocumentSections(geoUri) {
+    qsa('.dtmanifs > h3').forEach(h3 => {
+        h3.insertBefore(sparqlLink(studyDocsQuery(geoUri)), h3.firstChild);
+    });
+}
+
+
 function hackWorkPage(pageUri) {
     hackMainInfos(pageUri);
     hackWorkDocumentSections(pageUri);
     hackStudiesSection(pageUri);
+}
+
+
+function hackGeoPage(pageUri) {
+    hackMainInfos(pageUri);
+    hackGeoDocumentSections(pageUri);
 }
 
 
@@ -395,6 +408,9 @@ case 'author':
     break;
 case 'book':
     hackWorkPage(pageUri);
+    break;
+case 'geopoint':
+    hackGeoPage(pageUri);
     break;
 case 'home':
     if (document.location.pathname === '/') {
