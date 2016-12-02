@@ -350,6 +350,16 @@ function hackPeriodicalPage(pageUri) {
 }
 
 
+function hackSubjectPage(pageUri) {
+    hackMainInfos(pageUri);
+}
+
+
+function hackPerformancePage(pageUri) {
+    hackMainInfos(pageUri);
+}
+
+
 function hackHomePage() {
     const mapBlock = document.querySelector('#map-geo');
     insertBefore(sparqlLink(placesQuery()), mapBlock);
@@ -420,11 +430,15 @@ case 'geopoint':
 case 'periodical':
     hackPeriodicalPage(pageUri);
     break;
+case 'article':
+    hackSubjectPage(pageUri);
+    break;
+case 'performance':
+    hackPerformancePage(pageUri);
+    break;
 case 'home':
     if (document.location.pathname === '/') {
         hackHomePage();
     }
-// case 'article'
 // case 'date'
-// case 'performace'
 }
