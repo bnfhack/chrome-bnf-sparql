@@ -345,6 +345,11 @@ function hackGeoPage(pageUri) {
 }
 
 
+function hackPeriodicalPage(pageUri) {
+    hackMainInfos(pageUri);
+}
+
+
 function hackHomePage() {
     const mapBlock = document.querySelector('#map-geo');
     insertBefore(sparqlLink(placesQuery()), mapBlock);
@@ -412,13 +417,14 @@ case 'book':
 case 'geopoint':
     hackGeoPage(pageUri);
     break;
+case 'periodical':
+    hackPeriodicalPage(pageUri);
+    break;
 case 'home':
     if (document.location.pathname === '/') {
         hackHomePage();
     }
-// case 'geopoint'
 // case 'article'
 // case 'date'
-// case 'periodical'
 // case 'performace'
 }
