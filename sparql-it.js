@@ -243,9 +243,25 @@ function hackHomePage() {
 
 function guessPageType() {
     const ogtype = document.querySelector('meta[property="og:type"]');
-    return ogtype ? ogtype.content : null;
+    if (ogtype && ogtype.content) {
+        return ogtype.content;
+    }
+    const path = document.location.pathname;
+    if (path === '/') {
+        return 'home';
+    } else if (path.startsWith('/date')) {
+        return 'date';
+    } else if (path.startsWith('/3') || path.startsWith('/4')) {
+        const divtype = document.querySelector('#fullpage div[itemtype]'),
+              itemtype = divtype ? divtype.getAttribute('itemtype') : null;
+        if (itemtype === 'http://schema.org/Periodical') {
+            return 'periodical';
+        } else if (itemtype === 'http://schema.org/TheaterEvent') {
+            return 'performance';
+        }
+    }
+    return null;
 }
-
 
 
 function showModal(query) {
@@ -283,8 +299,13 @@ case 'author':
 case 'book':
     hackWorkPage(pageUri);
     break;
-case null:
+case 'home':
     if (document.location.pathname === '/') {
         hackHomePage();
     }
+// case 'geopoint'
+// case 'article'
+// case 'date'
+// case 'periodical'
+// case 'performace'
 }
