@@ -250,6 +250,23 @@ SELECT DISTINCT ?manif ?work ?title ?date ?type ?gallica WHERE {
 }
 
 
+function authorWorksQuery(authorUri) {
+    return `
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX rdarelationships: <http://rdvocab.info/RDARelationshipsWEMI/>
+
+SELECT ?work ?title (COUNT(?manif) as ?count) WHERE {
+ ?work dcterms:creator <${authorUri}#foaf:Person>;
+    dcterms:title ?title.
+
+  ?manif rdarelationships:workManifested ?work.
+}
+GROUP BY ?work ?title
+ORDER BY DESC(?count)
+`;
+}
+
+
 function storeQuery(query) {
     if (window.localStorage !== undefined) {
         localStorage.setItem('queryVal_main', JSON.stringify({val: query}));
@@ -278,11 +295,19 @@ function hackRelatedAuthors(authorUri) {
     });
 }
 
+
+function hackAuthorTitle(authorUri) {
+    const div = document.querySelector('#allmanifs');
+    insertBefore(sparqlLink(authorWorksQuery(authorUri)), div.firstChild);
+}
+
+
 function hackAuthorPage(pageUri) {
     hackMainInfos(pageUri);
     hackAuthorDocumentSections(pageUri);
     hackRelatedAuthors(pageUri);
     hackStudiesSection(pageUri);
+    hackAuthorTitle(pageUri);
 }
 
 
