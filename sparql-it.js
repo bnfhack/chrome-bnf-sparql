@@ -195,6 +195,40 @@ SELECT ?geo ?label ?lat ?lng ?geonames WHERE {
 }
 
 
+function studyDocsQuery(authorityUri) {
+    return `
+PREFIX rdarelationships: <http://rdvocab.info/RDARelationshipsWEMI/>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+
+
+SELECT DISTINCT ?manif ?work ?title ?date ?type ?gallica WHERE {
+
+  ?formerexpr owl:sameAs ?expr.
+
+  ?manif dcterms:subject <${authorityUri}> ;
+         rdarelationships:expressionManifested ?formerexpr ;
+         dcterms:title ?title.
+
+  OPTIONAL {
+    ?manif rdarelationships:workManifested ?work.
+  }
+
+  OPTIONAL {
+    ?manif rdarelationships:electronicReproduction ?gallica.
+  }
+
+  OPTIONAL {
+    ?manif dcterms:date ?date.
+  }
+
+  OPTIONAL {
+    ?formerexpr dcterms:type ?type.
+  }
+
+}`;
+}
+
+
 function storeQuery(query) {
     if (window.localStorage !== undefined) {
         localStorage.setItem('queryVal_main', JSON.stringify({val: query}));
@@ -220,6 +254,7 @@ function hackRelatedAuthors(authorUri) {
 function hackAuthorPage(pageUri) {
     hackAuthorDocumentSections(pageUri);
     hackRelatedAuthors(pageUri);
+    hackStudiesSection(pageUri);
 }
 
 
@@ -230,8 +265,16 @@ function hackWorkDocumentSections(workUri) {
 }
 
 
+function hackStudiesSection(pageUri) {
+    qsa('.bloc-contenu a[href$=studies').forEach(link => {
+        insertBefore(sparqlLink(studyDocsQuery(pageUri)), link);
+    });
+}
+
+
 function hackWorkPage(pageUri) {
     hackWorkDocumentSections(pageUri);
+    hackStudiesSection(pageUri);
 }
 
 
