@@ -85,6 +85,27 @@ function sparqlLink(query) {
 }
 
 
+function authorityMainInfos(pageUri) {
+    return `
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+
+SELECT ?uri ?predicate ?object WHERE {
+
+  {
+    BIND (<${pageUri}> AS ?uri)
+    ?uri ?predicate ?object.
+  }
+
+  UNION
+
+  {
+    <${pageUri}> foaf:focus ?uri.
+    ?uri ?predicate ?object.
+  }
+
+}`;
+}
+
 function authorDocsQuery(role, authorUri) {
     return `
 PREFIX bnfroles: <http://data.bnf.fr/vocabulary/roles/>
@@ -236,6 +257,12 @@ function storeQuery(query) {
 }
 
 
+function hackMainInfos(pageUri) {
+    const h1 = document.querySelector('h1');
+    insertBefore(sparqlLink(authorityMainInfos(pageUri)), h1.firstChild);
+}
+
+
 function hackAuthorDocumentSections(authorUri) {
     qsa('.dtmanifs > h3 > a:first-child').forEach(link => {
         const role = link.href.split('/').pop();
@@ -252,6 +279,7 @@ function hackRelatedAuthors(authorUri) {
 }
 
 function hackAuthorPage(pageUri) {
+    hackMainInfos(pageUri);
     hackAuthorDocumentSections(pageUri);
     hackRelatedAuthors(pageUri);
     hackStudiesSection(pageUri);
@@ -273,6 +301,7 @@ function hackStudiesSection(pageUri) {
 
 
 function hackWorkPage(pageUri) {
+    hackMainInfos(pageUri);
     hackWorkDocumentSections(pageUri);
     hackStudiesSection(pageUri);
 }
