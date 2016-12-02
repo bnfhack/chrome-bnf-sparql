@@ -67,26 +67,28 @@ function sparqlUrl(query, mimetype) {
 }
 
 
-function executeQueryLink(query) {
+function executeQueryLink(querydef) {
     const a = crel('a', {'class': 'sparql-link',
                          target: '_blank',
                          title: 'Execute Query',
                          href: '#'},
                    crel('i', {'class': 'glyphicon glyphicon-search'}),
                    'SPARQL-it');
-    a.onclick = (evt) => {showModal(query); evt.preventDefault();};
+    a.onclick = (evt) => {showModal(querydef); evt.preventDefault();};
     return a;
 }
 
 
-function sparqlLink(query) {
+function sparqlLink(querydef) {
     return crel('span', {'class': 'sparql-it'},
-                executeQueryLink(query));
+                executeQueryLink(querydef));
 }
 
 
 function authorityMainInfos(pageUri) {
-    return `
+    return {
+        title: 'Informations principales',
+        query: `
 PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 
 SELECT ?uri ?predicate ?object WHERE {
@@ -103,11 +105,13 @@ SELECT ?uri ?predicate ?object WHERE {
     ?uri ?predicate ?object.
   }
 
-}`;
+}`};
 }
 
 function authorDocsQuery(role, authorUri) {
-    return `
+    return {
+        title: `Contributions de ${authorUri} avec le rôle ${role}`,
+        query:`
 PREFIX bnfroles: <http://data.bnf.fr/vocabulary/roles/>
 PREFIX rdarelationships: <http://rdvocab.info/RDARelationshipsWEMI/>
 PREFIX dcterms: <http://purl.org/dc/terms/>
@@ -135,11 +139,13 @@ SELECT DISTINCT ?manif ?work ?title ?date ?type ?gallica WHERE {
     ?formerexpr dcterms:type ?type.
   }
 
-}`;
+}`};
 }
 
 function workDocsQuery(workUri) {
-    return `
+    return {
+        title: `Documents associés à l'œuvre ${workUri}`,
+        query: `
 PREFIX rdarelationships: <http://rdvocab.info/RDARelationshipsWEMI/>
 PREFIX dcterms: <http://purl.org/dc/terms/>
 
@@ -161,12 +167,14 @@ SELECT DISTINCT ?manif ?title ?date ?type ?gallica WHERE {
   OPTIONAL {
     ?formerexpr dcterms:type ?type.
   }
-}`;
+}`};
 }
 
 
 function relatedAuthorsQuery(authorUri) {
-    return `
+    return {
+        title: `Auteurs reliés à ${authorUri}`,
+        query: `
 PREFIX dcterms: <http://purl.org/dc/terms/>
 PREFIX bnfroles: <http://data.bnf.fr/vocabulary/roles/>
 PREFIX foaf: <http://xmlns.com/foaf/0.1/>
@@ -186,12 +194,14 @@ SELECT ?role1 ?manif ?title ?role2 ?author2 ?author2name WHERE {
   FILTER(regex(?role1, 'http://data.bnf.fr/vocabulary/roles'))
   FILTER(regex(?role2, 'http://data.bnf.fr/vocabulary/roles'))
   FILTER(?author2 != <${authorUri}#foaf:Person>)
-}`;
+}`};
 }
 
 
 function placesQuery() {
-    return `
+    return {
+        title: 'Lieux documentés dans databnf',
+        query: `
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 PREFIX geo: <http://www.w3.org/2003/01/geo/wgs84_pos#>
@@ -212,12 +222,14 @@ SELECT ?geo ?label ?lat ?lng ?geonames WHERE {
 
   ?rameau a skos:Concept.
 }
-`;
+`};
 }
 
 
 function studyDocsQuery(authorityUri) {
-    return `
+    return {
+        title: `Documents au sujet de ${authorityUri}`,
+        query: `
 PREFIX rdarelationships: <http://rdvocab.info/RDARelationshipsWEMI/>
 PREFIX dcterms: <http://purl.org/dc/terms/>
 
@@ -246,12 +258,14 @@ SELECT DISTINCT ?manif ?work ?title ?date ?type ?gallica WHERE {
     ?formerexpr dcterms:type ?type.
   }
 
-}`;
+}`};
 }
 
 
 function authorWorksQuery(authorUri) {
-    return `
+    return {
+        title: `Œuvres de ${authorUri}`,
+        query: `
 PREFIX dcterms: <http://purl.org/dc/terms/>
 PREFIX rdarelationships: <http://rdvocab.info/RDARelationshipsWEMI/>
 
@@ -263,7 +277,7 @@ SELECT ?work ?title (COUNT(?manif) as ?count) WHERE {
 }
 GROUP BY ?work ?title
 ORDER BY DESC(?count)
-`;
+`};
 }
 
 
@@ -389,7 +403,8 @@ function guessPageType() {
 }
 
 
-function showModal(query) {
+function showModal(querydef) {
+    const {query, title} = querydef;
     if (!MODAL) {
         MODAL = buildModal();
         document.body.appendChild(MODAL);
@@ -399,6 +414,7 @@ function showModal(query) {
     backdrop.classList.add('in');
     MODAL.style.display = 'block';
     MODAL.classList.add('fade', 'in');
+    MODAL.querySelector('#sparql-modal-title').textContent = title || 'SPARQL-it !';
     MODAL.querySelector('#sparqlit-modal-pre').textContent = query;
     MODAL.querySelector('#sparqlit-modal-exec').href = sparqlUrl(query);
     MODAL.querySelector('#sparqlit-modal-dl').href = sparqlUrl(query, 'application/sparql-results+json');
