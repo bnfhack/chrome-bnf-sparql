@@ -430,31 +430,35 @@ function hideModal() {
 }
 
 
-let permalink = document.querySelector('link[rel=bookmark]'),
-    pageUri = (permalink === null) ? null : permalink.href;
+try {
+    let permalink = document.querySelector('link[rel=bookmark]'),
+        pageUri = (permalink === null) ? null : permalink.href;
 
-switch(guessPageType()) {
-case 'author':
-    hackAuthorPage(pageUri);
-    break;
-case 'book':
-    hackWorkPage(pageUri);
-    break;
-case 'geopoint':
-    hackGeoPage(pageUri);
-    break;
-case 'periodical':
-    hackPeriodicalPage(pageUri);
-    break;
-case 'article':
-    hackSubjectPage(pageUri);
-    break;
-case 'performance':
-    hackPerformancePage(pageUri);
-    break;
-case 'home':
-    if (document.location.pathname === '/') {
-        hackHomePage();
+    switch(guessPageType()) {
+    case 'author':
+        hackAuthorPage(pageUri);
+        break;
+    case 'book':
+        hackWorkPage(pageUri);
+        break;
+    case 'geopoint':
+        hackGeoPage(pageUri);
+        break;
+    case 'periodical':
+        hackPeriodicalPage(pageUri);
+        break;
+    case 'article':
+        hackSubjectPage(pageUri);
+        break;
+    case 'performance':
+        hackPerformancePage(pageUri);
+        break;
+    case 'home':
+        if (document.location.pathname === '/') {
+            hackHomePage();
+        }
+        // case 'date'
     }
-// case 'date'
+} catch(err) {
+    console.log('failed to activate sparql-it extension because', err);
 }
