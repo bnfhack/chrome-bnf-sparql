@@ -2,6 +2,13 @@
 
 let MODAL;
 
+
+function qs(selector, context) {
+    context = context || document;
+    return context.querySelector(selector);
+}
+
+
 function qsa(selector) {
     return Array.from(document.querySelectorAll(selector));
 }
@@ -316,7 +323,73 @@ function hackAuthorTitle(authorUri) {
 }
 
 
+function parentNode(node) {
+    if (node === null) {
+        return null;
+    }
+    return node.parentNode;
+}
+
+
+function tooltipize(node, text) {
+    if (node === null) {
+        return;
+    }
+    node.setAttribute('data-sparql', text);
+    node.classList.add('sparql-tooltip');
+}
+
+
+function infoBoxItem(...texts) {
+    for (let item of qsa('.cartouche-infos tr > td')) {
+        for (let text of texts) {
+            if (item.textContent.startsWith(text)) {
+                return item.nextSibling;
+            }
+        }
+    }
+    return null;
+}
+
+
+function annotateAuthorPage(pageUri) {
+    tooltipize(qs('h1'), 'skos:prefLabel');
+    tooltipize(qs('#depict'), 'foaf:focus → ?p → foaf:depiction');
+    tooltipize(qs('.cartouche-infos [itemprop=nationality]'), 'foaf:focus → ?p → rdagroup2elements:countryAssociatedWithThePerson');
+    tooltipize(infoBoxItem('Field', 'Domaine'), 'foaf:focus → ?p → rdagroup2elements:fieldOfActivityOfThePerson');
+    tooltipize(qs('.cartouche-infos [itemprop=description]'), 'skos:note');
+    tooltipize(parentNode(qs('.cartouche-infos [itemprop=birthDate]')), 'foaf:focus → ?p → {bio:birth, rdagroup2elements:placeOfBirth}');
+    tooltipize(parentNode(qs('.cartouche-infos [itemprop=deathDate]')), 'foaf:focus → ?p → {bio:death, rdagroup2elements:placeOfDeath}');
+    tooltipize(infoBoxItem('Sexe', 'Gender'), 'foaf:focus → ?p → foaf:gender');
+    tooltipize(infoBoxItem('Langu'), 'foaf:focus → ?p → rdagroup2elements:languageOfThePerson');
+    tooltipize(infoBoxItem('Variant', 'Autre'), 'skos:altLabel');
+    tooltipize(qs('.cartouche-infos a[href^="http://isni"]'), 'isni:identifierValid');
+    qsa('.dtmanifs > h3 > a:first-child').forEach(link => {
+        const role = link.href.split('/').pop();
+        tooltipize(link, `bnfroles:${role}`);
+        tooltipize(link.nextSibling, `?x foaf:focus ?p; ?expr bnfroles:${role} ?p; ?manif rdarelationships:expressionManifested ?expr`);
+    });
+    qsa('span.liens a[href^="http://ark.bnf"]').forEach(link => {
+        const div = link.parentNode.parentNode;
+        tooltipize(div, '?expo a bnf-onto:expositionVirtuelle; dcterms:subject ?x');
+    });
+}
+
+
+function annotateWorkPage(pageUri) {
+    tooltipize(qs('h1'), 'skos:prefLabel');
+    tooltipize(qs('#depict'), 'foaf:focus → ?p → foaf:depiction');
+    tooltipize(parentNode(qs('.h1-auteur [itemprop=Creator]')), 'foaf:focus → ?w → dcterms:creator');
+    tooltipize(parentNode(qs('.cartouche-infos [itemprop=datePublished]')), 'foaf:focus → ?w → rdagroup1elements:dateOfWork');
+    tooltipize(parentNode(qs('.cartouche-infos [itemprop=genre]')), 'foaf:focus → ?w → bnf-onto:subject');
+    tooltipize(qs('.cartouche-infos [itemprop=description]'), 'skos:note');
+    tooltipize(infoBoxItem('Langu'), 'foaf:focus → ?w → dcterms:language')
+    tooltipize(infoBoxItem('Variant', 'Autre'), 'skos:altLabel');
+}
+
+
 function hackAuthorPage(pageUri) {
+    annotateAuthorPage(pageUri);
     hackMainInfos(pageUri);
     hackAuthorDocumentSections(pageUri);
     hackRelatedAuthors(pageUri);
@@ -347,6 +420,7 @@ function hackGeoDocumentSections(geoUri) {
 
 
 function hackWorkPage(pageUri) {
+    annotateWorkPage(pageUri);
     hackMainInfos(pageUri);
     hackWorkDocumentSections(pageUri);
     hackStudiesSection(pageUri);
