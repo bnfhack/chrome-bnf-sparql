@@ -354,7 +354,7 @@ function infoBoxItem(...texts) {
 
 function annotateAuthorPage(pageUri) {
     tooltipize(qs('h1'), 'skos:prefLabel');
-    tooltipize(qs('#depict'), 'foaf:focus → ?p → foaf:depiction');
+    tooltipize(parentNode(qs('#depict')), 'foaf:focus → ?p → foaf:depiction');
     tooltipize(qs('.cartouche-infos [itemprop=nationality]'), 'foaf:focus → ?p → rdagroup2elements:countryAssociatedWithThePerson');
     tooltipize(infoBoxItem('Field', 'Domaine'), 'foaf:focus → ?p → rdagroup2elements:fieldOfActivityOfThePerson');
     tooltipize(qs('.cartouche-infos [itemprop=description]'), 'skos:note');
@@ -378,7 +378,7 @@ function annotateAuthorPage(pageUri) {
 
 function annotateWorkPage(pageUri) {
     tooltipize(qs('h1'), 'skos:prefLabel');
-    tooltipize(qs('#depict'), 'foaf:focus → ?p → foaf:depiction');
+    tooltipize(parentNode(qs('#depict')), 'foaf:focus → ?W → foaf:depiction');
     tooltipize(parentNode(qs('.h1-auteur [itemprop=Creator]')), 'foaf:focus → ?w → dcterms:creator');
     tooltipize(parentNode(qs('.cartouche-infos [itemprop=datePublished]')), 'foaf:focus → ?w → rdagroup1elements:dateOfWork');
     tooltipize(parentNode(qs('.cartouche-infos [itemprop=genre]')), 'foaf:focus → ?w → bnf-onto:subject');
