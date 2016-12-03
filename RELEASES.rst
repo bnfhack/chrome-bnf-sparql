@@ -2,6 +2,14 @@
  Relase Notes
 ==============
 
+
+NEXT RELEASE
+============
+
+- add a few links on performance, periodical and topic pages,
+- added tooltips on author and work pages to display corresponding RDF properties
+
+
 0.1.0
 =====
 
