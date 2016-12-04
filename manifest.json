@@ -7,7 +7,10 @@
   "content_scripts": [
     {
       "matches": ["http://data.bnf.fr/*"],
-      "css": ["sparql-it.css"],
+      "css": [
+          "fontello-embedded.css",
+          "sparql-it.css"
+      ],
       "js": ["crel.min.js",
              "sigma.min.js",
              "sigma.layout.forceAtlas2.min.js",

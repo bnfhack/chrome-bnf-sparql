@@ -242,7 +242,8 @@ function buildGraph(pageUri) {
         .then(results => initGraph(sigma, results, pageUri))
         .then(graph => {
             const a = crel('a', {'class': 'sparql-link sparqlit-graph-toggler',
-                                 href: '#'}, '[Graphe (visu)]');
+                                 href: '#'},
+                           crel('span', {'class': 'fontello'}, '\uf527'));
             a.onclick = (evt) => {
                 showGraphModal();
                 evt.preventDefault();

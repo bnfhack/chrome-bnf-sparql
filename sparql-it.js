@@ -79,8 +79,7 @@ function executeQueryLink(querydef) {
                          target: '_blank',
                          title: 'Execute Query',
                          href: '#'},
-                   crel('i', {'class': 'glyphicon glyphicon-search'}),
-                   'SPARQL-it');
+                   crel('span', {'class': 'fontello'}, '\ue800'));
     a.onclick = (evt) => {showModal(querydef); evt.preventDefault();};
     return a;
 }

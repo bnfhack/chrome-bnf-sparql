@@ -1,7 +1,16 @@
 .sparql-link {
-  padding: 0 1em;
-  color: red;
+  font-family: 'fontello';
+  padding: 0.5em;
+  margin: 0.5em;
+  color: #b50176 !important;
+  font-size: 16px;
 }
+
+
+.fontello {
+  font-family: 'fontello';
+}
+
 
 h3.sparql-tooltip {
   display: block;
