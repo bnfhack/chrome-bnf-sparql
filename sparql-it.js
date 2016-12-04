@@ -351,6 +351,22 @@ function infoBoxItem(...texts) {
     return null;
 }
 
+function annotatePerfSubtitles() {
+    for (let item of qsa('.h1-auteur ul li')) {
+        if (item.textContent.startsWith('Work') || item.textContent.startsWith('Œuvre')) {
+            const sublinks = item.querySelectorAll('a');
+            tooltipize(sublinks[0], 'foaf:focus → ?p → dcterms:subject');
+            if (sublinks.length > 1) {
+                tooltipize(sublinks[1], 'foaf:focus → ?p → bnfroles:r70');
+            }
+        }
+        if (item.textContent.startsWith('Metteur')) {
+            const sublinks = item.querySelectorAll('a');
+            tooltipize(sublinks[0], 'foaf:focus → ?p → bnfroles:r1010');
+        }
+    }
+}
+
 
 function annotateAuthorPage(pageUri) {
     tooltipize(qs('h1'), 'skos:prefLabel');
@@ -425,6 +441,14 @@ function annotateSubjectPage(pageUri) {
 }
 
 
+function annotatePerformancePage(pageUri) {
+    tooltipize(qs('h1 span[itemprop=name]'), 'foaf:focus → ?p → rdfs:label');
+    tooltipize(qs('h1 span.du-subtitle'), 'foaf:focus → ?p → schema:location');
+    tooltipize(qs('h1 span.du-subtitle a'), 'foaf:focus → ?p → dcterms:date');
+    annotatePerfSubtitles();
+}
+
+
 function hackAuthorPage(pageUri) {
     annotateAuthorPage(pageUri);
     hackMainInfos(pageUri);
@@ -484,6 +508,7 @@ function hackSubjectPage(pageUri) {
 
 
 function hackPerformancePage(pageUri) {
+    annotatePerformancePage(pageUri);
     hackMainInfos(pageUri);
 }
 
