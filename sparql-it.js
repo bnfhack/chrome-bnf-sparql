@@ -413,6 +413,18 @@ function annotateGeoPage(pageUri) {
 }
 
 
+function annotateSubjectPage(pageUri) {
+    tooltipize(qs('h1'), 'skos:prefLabel');
+    tooltipize(parentNode(qs('#depict')), 'foaf:focus → ?p → foaf:depiction');
+    tooltipize(qs('.cartouche-infos [itemprop=description]'), 'skos:note');
+    tooltipize(infoBoxItem('Variant', 'Autre'), 'skos:altLabel');
+    tooltipize(infoBoxItem('Geographic', 'Notice'), 'skos:closeMatch');
+    tooltipize(qs('#broader'), 'skos:broader');
+    tooltipize(qs('#narrower'), 'skos:narrower');
+    tooltipize(qs('#related'), 'skos:related');
+}
+
+
 function hackAuthorPage(pageUri) {
     annotateAuthorPage(pageUri);
     hackMainInfos(pageUri);
@@ -466,6 +478,7 @@ function hackPeriodicalPage(pageUri) {
 
 
 function hackSubjectPage(pageUri) {
+    annotateSubjectPage(pageUri);
     hackMainInfos(pageUri);
 }
 

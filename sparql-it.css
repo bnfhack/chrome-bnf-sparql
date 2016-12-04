@@ -3,7 +3,11 @@
   color: red;
 }
 
-.sparql-tooltip{
+h3.sparql-tooltip {
+  display: block;
+}
+
+.sparql-tooltip {
   display: inline;
   position: relative;
 }
