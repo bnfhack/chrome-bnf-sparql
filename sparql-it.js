@@ -399,6 +399,20 @@ function annotatePeriodicalPage(pageUri) {
 }
 
 
+function annotateGeoPage(pageUri) {
+    tooltipize(qs('h1'), 'skos:prefLabel');
+    tooltipize(parentNode(qs('#depict')), 'foaf:focus → ?p → foaf:depiction');
+    tooltipize(qs('.cartouche-infos [itemprop=geo]'), 'foaf:focus → ?g → geo:{lat,long}');
+    tooltipize(infoBoxItem('INSEE', 'Code'), 'foaf:focus → ?g → insee:code_commune');
+    tooltipize(infoBoxItem('gentile'), 'foaf:focus → ?g → bnf-onto:habitants');
+    tooltipize(infoBoxItem('Feuille', 'IGN'), 'foaf:focus → ?g → bnf-onto:referenceIGN');
+    tooltipize(infoBoxItem('Coordonnées L', 'Lambert'), 'foaf:focus → ?g → bnf-onto:coordonneesLambert');
+    tooltipize(infoBoxItem('Geographic a', 'Classif'), 'foaf:focus → ?g → bnf-onto:cadreGeographique');
+    tooltipize(infoBoxItem('Variant', 'Autre'), 'skos:altLabel');
+    tooltipize(infoBoxItem('Related t', 'Voir'), 'skos:closeMatch');
+}
+
+
 function hackAuthorPage(pageUri) {
     annotateAuthorPage(pageUri);
     hackMainInfos(pageUri);
@@ -439,6 +453,7 @@ function hackWorkPage(pageUri) {
 
 
 function hackGeoPage(pageUri) {
+    annotateGeoPage(pageUri);
     hackMainInfos(pageUri);
     hackGeoDocumentSections(pageUri);
 }
