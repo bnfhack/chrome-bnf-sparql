@@ -368,7 +368,7 @@ function annotatePerfSubtitles() {
 }
 
 
-function annotateAuthorPage(pageUri) {
+function annotateAuthorPage() {
     tooltipize(qs('h1'), 'skos:prefLabel');
     tooltipize(parentNode(qs('#depict')), 'foaf:focus → ?p → foaf:depiction');
     tooltipize(qs('.cartouche-infos [itemprop=nationality]'), 'foaf:focus → ?p → rdagroup2elements:countryAssociatedWithThePerson');
@@ -392,7 +392,7 @@ function annotateAuthorPage(pageUri) {
 }
 
 
-function annotateWorkPage(pageUri) {
+function annotateWorkPage() {
     tooltipize(qs('h1'), 'skos:prefLabel');
     tooltipize(parentNode(qs('#depict')), 'foaf:focus → ?W → foaf:depiction');
     tooltipize(parentNode(qs('.h1-auteur [itemprop=Creator]')), 'foaf:focus → ?w → dcterms:creator');
@@ -404,7 +404,7 @@ function annotateWorkPage(pageUri) {
 }
 
 
-function annotatePeriodicalPage(pageUri) {
+function annotatePeriodicalPage() {
     tooltipize(qs('h1'), 'skos:prefLabel');
     tooltipize(infoBoxItem('Tit'), 'skos:altLabel');
     tooltipize(parentNode(qs('.cartouche-infos [itemprop=inLanguage]')), 'foaf:focus → ?w → dcterms:language');
@@ -415,7 +415,7 @@ function annotatePeriodicalPage(pageUri) {
 }
 
 
-function annotateGeoPage(pageUri) {
+function annotateGeoPage() {
     tooltipize(qs('h1'), 'skos:prefLabel');
     tooltipize(parentNode(qs('#depict')), 'foaf:focus → ?p → foaf:depiction');
     tooltipize(qs('.cartouche-infos [itemprop=geo]'), 'foaf:focus → ?g → geo:{lat,long}');
@@ -429,7 +429,7 @@ function annotateGeoPage(pageUri) {
 }
 
 
-function annotateSubjectPage(pageUri) {
+function annotateSubjectPage() {
     tooltipize(qs('h1'), 'skos:prefLabel');
     tooltipize(parentNode(qs('#depict')), 'foaf:focus → ?p → foaf:depiction');
     tooltipize(qs('.cartouche-infos [itemprop=description]'), 'skos:note');
@@ -441,7 +441,7 @@ function annotateSubjectPage(pageUri) {
 }
 
 
-function annotatePerformancePage(pageUri) {
+function annotatePerformancePage() {
     tooltipize(qs('h1 span[itemprop=name]'), 'foaf:focus → ?p → rdfs:label');
     tooltipize(qs('h1 span.du-subtitle'), 'foaf:focus → ?p → schema:location');
     tooltipize(qs('h1 span.du-subtitle a'), 'foaf:focus → ?p → dcterms:date');
@@ -450,7 +450,7 @@ function annotatePerformancePage(pageUri) {
 
 
 function hackAuthorPage(pageUri) {
-    annotateAuthorPage(pageUri);
+    annotateAuthorPage();
     hackMainInfos(pageUri);
     hackAuthorDocumentSections(pageUri);
     hackRelatedAuthors(pageUri);
@@ -481,7 +481,7 @@ function hackGeoDocumentSections(geoUri) {
 
 
 function hackWorkPage(pageUri) {
-    annotateWorkPage(pageUri);
+    annotateWorkPage();
     hackMainInfos(pageUri);
     hackWorkDocumentSections(pageUri);
     hackStudiesSection(pageUri);
@@ -489,26 +489,26 @@ function hackWorkPage(pageUri) {
 
 
 function hackGeoPage(pageUri) {
-    annotateGeoPage(pageUri);
+    annotateGeoPage();
     hackMainInfos(pageUri);
     hackGeoDocumentSections(pageUri);
 }
 
 
 function hackPeriodicalPage(pageUri) {
-    annotatePeriodicalPage(pageUri);
+    annotatePeriodicalPage();
     hackMainInfos(pageUri);
 }
 
 
 function hackSubjectPage(pageUri) {
-    annotateSubjectPage(pageUri);
+    annotateSubjectPage();
     hackMainInfos(pageUri);
 }
 
 
 function hackPerformancePage(pageUri) {
-    annotatePerformancePage(pageUri);
+    annotatePerformancePage();
     hackMainInfos(pageUri);
 }
 
