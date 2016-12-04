@@ -37,3 +37,18 @@ h3.sparql-tooltip {
   position: absolute;
   z-index: 99;
 }
+
+.sparqlit-graph {
+  width: 1200px;
+  height: 1200px;
+}
+
+.sparqlit-graph-toggler {
+  padding-right: 0.5em;
+}
+
+#sparqlit-graphmodal .modal-dialog {
+  width: 1000px;
+  height: 800px;
+  overflow: auto;
+}

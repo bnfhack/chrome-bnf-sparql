@@ -8,7 +8,12 @@
     {
       "matches": ["http://data.bnf.fr/*"],
       "css": ["sparql-it.css"],
-      "js": ["crel.min.js", "sparql-it.js"]
+      "js": ["crel.min.js",
+             "sigma.min.js",
+             "sigma.layout.forceAtlas2.min.js",
+             "sigma.renderers.edgeLabels.min.js",
+             "sparql-it.graph.js",
+             "sparql-it.js"]
     }
   ],
   "browser_action": {

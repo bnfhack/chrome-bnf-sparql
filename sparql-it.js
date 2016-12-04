@@ -1,4 +1,4 @@
-/* global crel */
+/* global crel, buildGraph */
 
 let MODAL;
 
@@ -485,6 +485,7 @@ function hackWorkPage(pageUri) {
     hackMainInfos(pageUri);
     hackWorkDocumentSections(pageUri);
     hackStudiesSection(pageUri);
+    buildGraph(pageUri);
 }
 
 
