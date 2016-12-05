@@ -392,7 +392,7 @@ function annotateAuthorPage() {
 
 
 function annotateWorkPage() {
-    tooltipize(qs('h1'), 'skos:prefLabel');
+    tooltipize(qs('h1 span[itemprop=name]'), 'skos:prefLabel');
     tooltipize(parentNode(qs('#depict')), 'foaf:focus → ?W → foaf:depiction');
     tooltipize(parentNode(qs('.h1-auteur [itemprop=Creator]')), 'foaf:focus → ?w → dcterms:creator');
     tooltipize(parentNode(qs('.cartouche-infos [itemprop=datePublished]')), 'foaf:focus → ?w → rdagroup1elements:dateOfWork');
