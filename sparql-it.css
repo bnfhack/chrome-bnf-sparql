@@ -6,6 +6,13 @@
   font-size: 16px;
 }
 
+.sparql-link:hover {
+  border-bottom: 3px solid #95cc6b;
+}
+
+.sparql-link a:hover {
+  text-decoration: none;
+}
 
 .fontello {
   font-family: 'fontello';
@@ -22,8 +29,8 @@ h3.sparql-tooltip {
 }
 
 .sparql-tooltip:hover:after{
-  background: #333;
-  background: rgba(0,0,0,.8);
+  background-color: #b50176;
+  opacity: 0.9;
   border-radius: 5px;
   bottom: 26px;
   color: #fff;
