@@ -584,6 +584,14 @@ function guessPageType() {
 }
 
 
+function hideOnEscape(evt) {
+    if (evt.key === 'Escape') {
+        hideModal();
+        document.body.removeEventListener('keydown', hideOnEscape);
+    }
+}
+
+
 function showModal(querydef) {
     const {query, title} = querydef;
     if (!MODAL) {
@@ -593,6 +601,7 @@ function showModal(querydef) {
     const backdrop = modalBackdrop();
     document.body.appendChild(backdrop);
     backdrop.classList.add('in');
+    document.body.addEventListener('keydown', hideOnEscape);
     MODAL.style.display = 'block';
     MODAL.classList.add('fade', 'in');
     MODAL.querySelector('#sparql-modal-title').textContent = title || 'SPARQL-it !';
