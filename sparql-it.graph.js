@@ -52,8 +52,7 @@ function modalBackdrop() {
 }
 
 
-const GRAPHMODAL = buildGraphModal();
-document.body.appendChild(GRAPHMODAL);
+let GRAPHMODAL;
 
 
 function showGraphModal() {
@@ -238,6 +237,8 @@ function initGraph(sigma, results, pageUri) {
 let graphRendered = false;
 
 function buildGraph(pageUri) {
+    GRAPHMODAL = buildGraphModal();
+    document.body.appendChild(GRAPHMODAL);
     fetchWorkGraph(pageUri)
         .then(results => initGraph(sigma, results, pageUri))
         .then(graph => {
