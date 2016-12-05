@@ -204,6 +204,39 @@ SELECT ?role1 ?manif ?title ?role2 ?author2 ?author2name WHERE {
 }
 
 
+function musicalGenresQuery(authorUri) {
+    return {
+        title: `Œuvres musicales de ${authorUri} par genre`,
+        query: `
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX mo: <http://musicontology.com/>
+PREFIX bnf-onto: <http://data.bnf.fr/ontology/bnf-onto/>
+
+
+SELECT ?work ?title ?genre ?genrename ?year WHERE {
+
+  ?wconcept foaf:focus ?work;
+    skos:prefLabel ?title ;
+    mo:genre ?genre.
+
+  <${authorUri}> foaf:focus ?person.
+
+  ?work dcterms:creator ?person.
+
+  ?genre skos:prefLabel ?genrename.
+
+  OPTIONAL {
+   ?work bnf-onto:firstYear ?year
+  }
+
+} ORDER BY ?genrename ?year
+`};
+}
+
+
+
 function placesQuery() {
     return {
         title: 'Lieux documentés dans databnf',
@@ -313,6 +346,14 @@ function hackRelatedAuthors(authorUri) {
     qsa(`.bloc-contenu a[href="http://data.bnf.fr/linked-authors/${authorUri.slice(32, 40)}"]`).forEach(a => {
         insertBefore(sparqlLink(relatedAuthorsQuery(authorUri)), a);
     });
+}
+
+
+function hackAuthorMusicalGenresSection(authorUri) {
+    qsa(`.bloc-contenu a[href="${document.location.href}genres"]`).forEach(a => {
+        insertBefore(sparqlLink(musicalGenresQuery(authorUri)), a);
+    });
+
 }
 
 
@@ -454,6 +495,7 @@ function hackAuthorPage(pageUri) {
     hackAuthorDocumentSections(pageUri);
     hackRelatedAuthors(pageUri);
     hackStudiesSection(pageUri);
+    hackAuthorMusicalGenresSection(pageUri);
     hackAuthorTitle(pageUri);
 }
 
