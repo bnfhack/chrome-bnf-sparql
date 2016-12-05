@@ -393,7 +393,7 @@ function annotateAuthorPage() {
 
 function annotateWorkPage() {
     tooltipize(qs('h1 span[itemprop=name]'), 'skos:prefLabel');
-    tooltipize(parentNode(qs('#depict')), 'foaf:focus → ?W → foaf:depiction');
+    tooltipize(parentNode(qs('#depict')), 'foaf:focus → ?w → foaf:depiction');
     tooltipize(parentNode(qs('.h1-auteur [itemprop=Creator]')), 'foaf:focus → ?w → dcterms:creator');
     tooltipize(parentNode(qs('.cartouche-infos [itemprop=datePublished]')), 'foaf:focus → ?w → rdagroup1elements:dateOfWork');
     tooltipize(parentNode(qs('.cartouche-infos [itemprop=genre]')), 'foaf:focus → ?w → bnf-onto:subject');
@@ -407,7 +407,7 @@ function annotatePeriodicalPage() {
     tooltipize(qs('h1'), 'skos:prefLabel');
     tooltipize(infoBoxItem('Tit'), 'skos:altLabel');
     tooltipize(parentNode(qs('.cartouche-infos [itemprop=inLanguage]')), 'foaf:focus → ?w → dcterms:language');
-    tooltipize(parentNode(qs('#depict')), 'foaf:focus → ?W → foaf:depiction');
+    tooltipize(parentNode(qs('#depict')), 'foaf:focus → ?w → foaf:depiction');
     tooltipize(infoBoxItem('Creation', 'Date de'), 'foaf:focus → ?w → bnf-onto:firstYear');
     tooltipize(infoBoxItem('End of', 'Fin de'), 'foaf:focus → ?w → bnf-onto:lastYear');
     tooltipize(qs('.cartouche-infos [itemprop=issn]'), 'foaf:focus → ?w → bibo:issn');
