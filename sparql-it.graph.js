@@ -361,7 +361,7 @@ function _buildGraph(pageUri, graphPromise, settings) {
                 evt.preventDefault();
                 if (!graphRendered) {
                     graphRendered = true;
-                    startAtlas(graph, 2500, settings.atlasSettings);
+                    startAtlas(graph, 1500, settings.atlasSettings);
                 }
             };
             const h1 = document.querySelector('h1');
