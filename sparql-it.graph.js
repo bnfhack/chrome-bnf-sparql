@@ -306,7 +306,8 @@ function contributorGraphFromResults(results, pageUri) {
 
 function initGraph(sigma, graph, customSettings) {
     const settings = Object.assign({
-        nodeLabelSize: 'proportional',
+        labelSize: 'proportional',
+        labelSizeRatio: 2,
         maxNodeSize: 20,
         maxEdgeSize: 5,
         labelThreshold: 0,
