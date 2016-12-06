@@ -1,4 +1,4 @@
-/* global crel, buildGraph */
+/* global crel, buildWorkGraph, buildAuthorGraph */
 
 let MODAL;
 
@@ -497,6 +497,7 @@ function hackAuthorPage(pageUri) {
     hackStudiesSection(pageUri);
     hackAuthorMusicalGenresSection(pageUri);
     hackAuthorTitle(pageUri);
+    buildAuthorGraph(pageUri);
 }
 
 
@@ -526,7 +527,7 @@ function hackWorkPage(pageUri) {
     hackMainInfos(pageUri);
     hackWorkDocumentSections(pageUri);
     hackStudiesSection(pageUri);
-    buildGraph(pageUri);
+    buildWorkGraph(pageUri);
 }
 
 

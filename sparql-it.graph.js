@@ -13,7 +13,7 @@ function parseSparqlResponse(response) {
 }
 
 
-function buildGraphModal() {
+function buildGraphModal(title) {
     let closeBtn1, closeBtn2;
     const modalNode = crel(
         'div', {id: 'sparqlit-graphmodal',
@@ -31,7 +31,7 @@ function buildGraphModal() {
                                         crel('span', {'aria-hidden': true}, 'x')),
                        crel('h4', {'class': 'modal-title',
                                    'id': 'sparql-graphmodal-title'},
-                            'SPARQL-it Extrait du graphe Œuvre / Expr / Manif / Contributeur')),
+                            title)),
                   crel('div', {'class': 'modal-body'},
                        crel('div', {id: 'sparqlit-graphmodal-container',
                                     'class': 'sparqlit-graph'})),
@@ -72,7 +72,6 @@ function hideGraphModal() {
 }
 
 
-
 function fetchWorkGraph(workUri) {
     const query = `
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
@@ -104,6 +103,36 @@ SELECT DISTINCT ?expr ?formerexpr ?manif ?title ?contributor ?clabel ?role ?role
         .then(parseSparqlResponse);
 }
 
+
+function fetchContributorsGraph(authorUri) {
+    const query = `
+
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX bnfroles: <http://data.bnf.fr/vocabulary/roles/>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+SELECT DISTINCT ?author ?authorname ?role ?rolename ?manif ?title WHERE {
+
+  ?expr dcterms:contributor <${authorUri}#foaf:Person> ;
+    ?role ?author.
+
+  ?author a foaf:Person;
+       foaf:name ?authorname.
+
+  ?formerexpr owl:sameAs ?expr.
+  ?manif rdarelationships:expressionManifested ?formerexpr ;
+         dcterms:title ?title.
+
+  ?role skos:prefLabel ?rolename.
+
+  FILTER(regex(?role, 'http://data.bnf.fr/vocabulary/roles'))
+} LIMIT 50000
+`;
+    return executeQuery(query)
+        .then(parseSparqlResponse);
+}
+
 const colors = [
     '#1f77b4',
     '#ff7f0e',
@@ -130,40 +159,57 @@ function colorScale() {
 }
 
 
-function graphFromResults(results, pageUri) {
+function Graph() {
+
+    const edgesById = {};
+    const nodesById = {};
+
+    return {
+        nodes: [],
+        edges: [],
+        addNode(id, params) {
+            if (!nodesById[id]) {
+                params = Object.assign({id,
+                                        x: Math.random(),
+                                        y: Math.random(),
+                                        size: 1}, params);
+                nodesById[id] = params;
+                this.nodes.push(params);
+            } else {
+                nodesById[id].size++;
+            }
+        },
+        addEdge(source, target, props) {
+            const id = props.id || `${source}-${target}`;
+            if (!edgesById[id]) {
+                props = Object.assign({id,
+                                       type: 'arrow',
+                                       source,
+                                       target,
+                                       label: id,
+                                       size: 1}, props);
+                edgesById[id] = props;
+                this.edges.push(props);
+            } else {
+                edgesById[id].size++;
+            }
+
+        }
+    }
+}
+
+
+function workGraphFromResults(results, pageUri) {
     const conceptid = Number(pageUri.slice(32, 40)),
           workid = `${conceptid}-w`,
           roleColors = colorScale(),
           typeColors = colorScale();
-    const graph = {nodes: [], edges: []};
-    const edgesById = {};
-    const processed = {};
+    const graph = Graph();
 
-    function addNode(id, params) {
-        if (!processed[id]) {
-            processed[id] = true;
-            params.label = `${params.label} [${params.url}]`;
-            graph.nodes.push(Object.assign({id,
-                                            x: Math.random(),
-                                            y: Math.random(),
-                                            size: 1}, params));
-        }
+    function addNode(nodeid, props) {
+        props.label = `${props.label} [${props.url}]`;
+        graph.addNode(nodeid, props);
     }
-
-    function addEdge(source, target, props) {
-        const id = props.id || `${source}-${target}`;
-        if (!edgesById[id]) {
-            props = Object.assign({id,
-                                   type: 'arrow',
-                                   source,
-                                   target,
-                                   label: id,
-                                   size: 1}, props);
-            edgesById[id] = props;
-            graph.edges.push(props);
-        }
-    }
-
     addNode(conceptid, {label: 'Concept',
                         url: pageUri,
                         color: typeColors('Concept'),
@@ -172,7 +218,7 @@ function graphFromResults(results, pageUri) {
                      url: pageUri + '#frbr:Work',
                      color: typeColors('Work'),
                      size: 20});
-    addEdge(conceptid, workid, {id: 'foaf:focus', color: 'red'});
+    graph.addEdge(conceptid, workid, {id: 'foaf:focus', color: 'red'});
 
     results.forEach(rowdef => {
         const manifid = rowdef.manif.value.slice(32, 40),
@@ -201,28 +247,78 @@ function graphFromResults(results, pageUri) {
                           color: typeColors('Manifestation'),
                           size: 5});
 
-        addEdge(formerexprid, exprid, {label: 'owl:sameAs'});
-        addEdge(exprid, contributor, {label: `${rolelabel} (bnfroles:r{role})`,
-                                      color: roleColors(role),
-                                      id: `${exprid}-${role}-${contributor}`});
-        addEdge(manifid, formerexprid, {label: 'rdarelationships:expressionManifested'});
-        addEdge(manifid, workid, {label: 'rdarelationships:workManifested'});
+        graph.addEdge(formerexprid, exprid, {label: 'owl:sameAs'});
+        graph.addEdge(exprid, contributor, {label: `${rolelabel} (bnfroles:r{role})`,
+                                            color: roleColors(role),
+                                            id: `${exprid}-${role}-${contributor}`});
+        graph.addEdge(manifid, formerexprid, {label: 'rdarelationships:expressionManifested'});
+        graph.addEdge(manifid, workid, {label: 'rdarelationships:workManifested'});
     });
 
     return graph;
 }
 
 
-function initGraph(sigma, results, pageUri) {
-    const graph = graphFromResults(results, pageUri);
+function contributorGraphFromResults(results, pageUri) {
+    const conceptid = Number(pageUri.slice(32, 40)),
+          dctitle = document.querySelector('head meta[name="DC.title"]').getAttribute('content'),
+          roleColors = colorScale();
+    const graph = Graph();
+
+    graph.addNode(conceptid, {label: dctitle.split('(')[0].trim(),
+                              url: pageUri,
+                              color: 'red',
+                              size: 1});
+
+    const contributions = {};
+    results.forEach(rowdef => {
+        const author = Number(rowdef.author.value.slice(32, 40)),
+              authorname = rowdef.authorname.value,
+              manifid = rowdef.manif.value.slice(32, 40),
+              role = Number(rowdef.role.value.split('/').pop().slice(1));
+        graph.addNode(author, {label: authorname,
+                               url: rowdef.author.value,
+                               color: roleColors(role),
+                               size: 10})
+        if (contributions[manifid] === undefined) {
+            contributions[manifid] = new Set();
+        }
+        contributions[manifid].add(author);
+    });
+
+    graph.nodes = graph.nodes.sort((n1, n2) => n2.size - n1.size).slice(0, 30);
+    const keptContriubtors = new Set(graph.nodes.map(n => n.id));
+    Object.keys(contributions).forEach(manifid => {
+        let authors = contributions[manifid];
+        authors = Array.from(authors).filter(a => keptContriubtors.has(a));
+        for (const author1 of authors) {
+            for (const author2 of authors) {
+                if (author1 !== author2) {
+                    graph.addEdge(author1, author2, {type: 'def'});
+                }
+            }
+        }
+    });
+
+    return graph;
+}
+
+
+function initGraph(sigma, graph, customSettings) {
+    const settings = Object.assign({
+        nodeLabelSize: 'proportional',
+        maxNodeSize: 20,
+        maxEdgeSize: 5,
+        labelThreshold: 0,
+        drawLabels: true,
+        drawEdgeLabels: false
+    }, customSettings);
     const sigmaGraph = new sigma({
-        graph: graph,
+        graph,
+        settings,
         renderer: {
             container: 'sparqlit-graphmodal-container',
             type: 'canvas'
-        },
-        settings: {
-            edgeLabelSize: 'proportional'
         }
     });
     sigmaGraph.bind('clickNode', function(evt) {
@@ -236,11 +332,25 @@ function initGraph(sigma, results, pageUri) {
 
 let graphRendered = false;
 
-function buildGraph(pageUri) {
-    GRAPHMODAL = buildGraphModal();
+
+function startAtlas(graph, timeout, customSettings) {
+    const settings = Object.assign({
+        worker: true,
+        barnesHutOptimize: true,
+        edgeWeightInfluence: 4,
+        strongGravityMode: true
+    }, customSettings);
+    graph.startForceAtlas2(settings);
+    window.setTimeout(() => {
+        graph.stopForceAtlas2()
+    }, timeout);
+}
+
+
+function _buildGraph(pageUri, graphPromise, settings) {
+    GRAPHMODAL = buildGraphModal(settings.modalTitle);
     document.body.appendChild(GRAPHMODAL);
-    fetchWorkGraph(pageUri)
-        .then(results => initGraph(sigma, results, pageUri))
+    graphPromise
         .then(graph => {
             const a = crel('a', {'class': 'sparql-link sparqlit-graph-toggler',
                                  href: '#'},
@@ -250,14 +360,40 @@ function buildGraph(pageUri) {
                 evt.preventDefault();
                 if (!graphRendered) {
                     graphRendered = true;
-                    graph.startForceAtlas2({worker: true, barnesHutOptimize: false});
-                    window.setTimeout(() => {
-                        graph.stopForceAtlas2()
-                    }, 2500);
+                    startAtlas(graph, 2500, settings.atlasSettings);
                 }
             };
             const h1 = document.querySelector('h1');
             h1.insertBefore(a, h1.firstChild);
             return graph;
         })
+}
+
+
+function buildWorkGraph(pageUri) {
+    const graphPromise = fetchWorkGraph(pageUri)
+          .then(results => initGraph(sigma,
+                                     workGraphFromResults(results, pageUri),
+                                     {drawLabels: false,
+                                      drawEdgeLabels: true}));
+    _buildGraph(pageUri, graphPromise, {
+        modalTitle: 'Extrait du graphe Œuvre / Expr / Manif / Contributeur',
+        graphFactory: workGraphFromResults,
+        graphSettings: {
+            drawLabels: false,
+            drawEdgeLabels: true
+        },
+        atlasSettings: {}
+    });
+}
+
+
+function buildAuthorGraph(pageUri) {
+    const graphPromise = fetchContributorsGraph(pageUri)
+          .then(results => initGraph(sigma,
+                                     contributorGraphFromResults(results, pageUri)));
+    _buildGraph(pageUri, graphPromise, {
+        modalTitle: 'Les 30 auteurs les plus reliés',
+        atlasSettings: {}
+    });
 }
