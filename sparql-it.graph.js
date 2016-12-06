@@ -364,7 +364,8 @@ function _buildGraph(pageUri, graphPromise, settings) {
                 }
             };
             const h1 = document.querySelector('h1');
-            h1.insertBefore(a, h1.firstChild);
+            h1.insertBefore(crel('span', {'class': 'sparql-it'}, a),
+                            h1.firstChild);
             return graph;
         })
 }
