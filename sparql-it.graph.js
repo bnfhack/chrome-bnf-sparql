@@ -167,6 +167,7 @@ function Graph() {
     return {
         nodes: [],
         edges: [],
+        edgesByNode: {},
         addNode(id, params) {
             if (!nodesById[id]) {
                 params = Object.assign({id,
@@ -189,6 +190,16 @@ function Graph() {
                                        label: id,
                                        size: 1}, props);
                 edgesById[id] = props;
+                if (this.edgesByNode[source] === undefined) {
+                    this.edgesByNode[source] = new Set([id]);
+                } else {
+                    this.edgesByNode[source].add(id);
+                }
+                if (this.edgesByNode[target] === undefined) {
+                    this.edgesByNode[target] = new Set([id]);
+                } else {
+                    this.edgesByNode[target].add(id);
+                }
                 this.edges.push(props);
             } else {
                 edgesById[id].size++;
@@ -325,6 +336,24 @@ function initGraph(sigma, graph, customSettings) {
     sigmaGraph.bind('clickNode', function(evt) {
         if (evt.data.node && evt.data.node.url) {
             window.open(evt.data.node.url, '_blank');
+        }
+    });
+    sigmaGraph.bind('overNode', function(evt) {
+        const edgeIds = graph.edgesByNode[evt.data.node.id];
+        if (edgeIds) {
+            sigmaGraph.graph.edges().forEach(edge => {
+                if (!edgeIds.has(edge.id)) {
+                    edge.hidden = true;
+                }
+            });
+            sigmaGraph.refresh();
+        }
+    });
+    sigmaGraph.bind('outNode', function(evt) {
+        const edgeIds = graph.edgesByNode[evt.data.node.id];
+        if (edgeIds) {
+            sigmaGraph.graph.edges().forEach(edge => {edge.hidden = false});
+            sigmaGraph.refresh();
         }
     });
     return sigmaGraph;
