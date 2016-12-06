@@ -77,7 +77,7 @@ function sparqlUrl(query, mimetype) {
 function executeQueryLink(querydef) {
     const a = crel('a', {'class': 'sparql-link',
                          target: '_blank',
-                         title: 'Execute Query',
+                         title: querydef.title,
                          href: '#'},
                    crel('span', {'class': 'fontello'}, '\ue800'));
     a.onclick = (evt) => {showModal(querydef); evt.preventDefault();};
