@@ -15,14 +15,24 @@
              "sigma.min.js",
              "sigma.layout.forceAtlas2.min.js",
              "sigma.renderers.edgeLabels.min.js",
-             "sparql-it.graph.js",
-             "sparql-it.js"]
+             "sparql-it.graph.js"
+            ]
     }
   ],
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
   "browser_action": {
+    "default_icon": {
+      "16": "icon-16.png",
+      "24": "icon-24.png",
+      "32": "icon-32.png"
+    },
+    "default_title": "SPARQL-it!",
     "default_icon": "icon.png"
   },
   "permissions": [
-      "activeTab"
+      "activeTab", "http://data.bnf.fr/*"
   ]
 }

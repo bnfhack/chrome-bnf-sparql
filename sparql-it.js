@@ -620,7 +620,6 @@ function hideModal() {
     MODAL.style.display = 'none';
 }
 
-
 try {
     let permalink = document.querySelector('link[rel=bookmark]'),
         pageUri = (permalink === null) ? null : permalink.href;
