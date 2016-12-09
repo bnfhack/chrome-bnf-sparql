@@ -1,3 +1,7 @@
+[data-sparql] {
+  text-decoration: underline;
+}
+
 .sparql-link {
   font-family: 'fontello';
   padding: 0.5em;
