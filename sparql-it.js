@@ -320,6 +320,219 @@ ORDER BY DESC(?count)
 }
 
 
+function subjectDateQuery(date) {
+    return {
+        title: `Thèmes reliés à la date ${date}`,
+        query: `
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+
+SELECT DISTINCT ?subject ?label WHERE {
+
+  ?subject skos:prefLabel ?label;
+          foaf:focus ?event.
+
+  ?event dcterms:date ${date}.
+}
+ORDER BY ?label
+`};
+}
+
+
+function personBirthQuery(date) {
+    return {
+        title: `Auteurs nés en ${date}`,
+        query: `
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX bnf-onto: <http://data.bnf.fr/ontology/bnf-onto/>
+
+SELECT DISTINCT ?auteur ?label (${date} as ?birth) ?death WHERE {
+
+  ?auteur skos:prefLabel ?label;
+          foaf:focus ?person.
+
+  ?person a foaf:Person ;
+          bnf-onto:firstYear ${date}.
+
+   OPTIONAL {
+      ?person bnf-onto:lastYear ?death.
+   }
+}
+ORDER BY ?label
+`};
+}
+
+
+function personDeathQuery(date) {
+    return {
+        title: `Auteurs morts en ${date}`,
+        query: `
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX bnf-onto: <http://data.bnf.fr/ontology/bnf-onto/>
+
+SELECT DISTINCT ?auteur ?label ?birth (${date} as ?death) WHERE {
+
+  ?auteur skos:prefLabel ?label;
+          foaf:focus ?person.
+
+  ?person a foaf:Person ;
+          bnf-onto:lastYear ${date}.
+
+   OPTIONAL {
+      ?person bnf-onto:firstYear ?birth.
+   }
+}
+ORDER BY ?label
+`};
+}
+
+
+function workStartQuery(date) {
+    return {
+        title: `Œuvres créées en ${date}`,
+        query: `
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX frbr: <http://rdvocab.info/uri/schema/FRBRentitiesRDA/>
+PREFIX bnf-onto: <http://data.bnf.fr/ontology/bnf-onto/>
+
+SELECT DISTINCT ?concept ?label (${date} as ?start) ?stop WHERE {
+
+  ?concept skos:prefLabel ?label;
+           foaf:focus ?work.
+
+  ?work a frbr:Work ;
+          bnf-onto:firstYear ${date}.
+
+   OPTIONAL {
+      ?work bnf-onto:lastYear ?stop.
+   }
+}
+ORDER BY ?label
+`};
+}
+
+
+function workStopQuery(date) {
+    return {
+        title: `Œuvres terminées en ${date}`,
+        query: `
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX frbr: <http://rdvocab.info/uri/schema/FRBRentitiesRDA/>
+PREFIX bnf-onto: <http://data.bnf.fr/ontology/bnf-onto/>
+
+SELECT DISTINCT ?concept ?label ?start (${date} as ?stop) WHERE {
+
+  ?concept skos:prefLabel ?label;
+           foaf:focus ?work.
+
+  ?work a frbr:Work ;
+          bnf-onto:lastYear ${date}.
+
+   OPTIONAL {
+      ?work bnf-onto:firstYear ?start.
+   }
+}
+ORDER BY ?label
+`};
+}
+
+
+function orgStartQuery(date) {
+    return {
+        title: `Organisations créés en ${date}`,
+        query: `
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX bnf-onto: <http://data.bnf.fr/ontology/bnf-onto/>
+
+SELECT DISTINCT ?org ?label (${date} as ?start) ?stop WHERE {
+
+  ?org skos:prefLabel ?label;
+       foaf:focus ?corp.
+
+  ?corp a foaf:Organization ;
+          bnf-onto:firstYear ${date}.
+
+   OPTIONAL {
+      ?corp bnf-onto:lastYear ?death.
+   }
+}
+ORDER BY ?label
+`};
+}
+
+
+function orgStopQuery(date) {
+    return {
+        title: `Fin d'activité en ${date}`,
+        query: `
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX bnf-onto: <http://data.bnf.fr/ontology/bnf-onto/>
+
+SELECT DISTINCT ?org ?label ?start (${date} as ?stop) WHERE {
+
+  ?org skos:prefLabel ?label;
+       foaf:focus ?corp.
+
+  ?corp a foaf:Organization ;
+          bnf-onto:lastYear ${date}.
+
+   OPTIONAL {
+      ?corp bnf-onto:firstYear ?death.
+   }
+}
+ORDER BY ?label
+`};
+}
+
+
+function performanceDateQuery(date) {
+    return {
+        title: `Spectacles représentés en ${date}`,
+        query: `
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX dcmitype: <http://purl.org/dc/dcmitype/>
+PREFIX bnf-onto: <http://data.bnf.fr/ontology/bnf-onto/>
+
+SELECT DISTINCT ?perf ?label WHERE {
+
+  ?concept skos:prefLabel ?label;
+           foaf:focus ?perf.
+
+  ?perf a dcmitype:Event ;
+          bnf-onto:firstYear ${date}.
+
+}
+ORDER BY ?label
+`};
+}
+
+
+function publicationDateQuery(date) {
+    return {
+        title: `Publications en ${date}`,
+        query: `
+PREFIX frbr: <http://rdvocab.info/uri/schema/FRBRentitiesRDA/>
+PREFIX bnf-onto: <http://data.bnf.fr/ontology/bnf-onto/>
+
+SELECT DISTINCT ?publi ?label WHERE {
+
+  ?publi a frbr:Manifestation ;
+         dcterms:title ?label ;
+         bnf-onto:firstYear ${date}.
+
+}
+ORDER BY ?label
+`};
+}
+
+
 function storeQuery(query) {
     if (window.localStorage !== undefined) {
         localStorage.setItem('queryVal_main', JSON.stringify({val: query}));
@@ -556,6 +769,30 @@ function hackPerformancePage(pageUri) {
 }
 
 
+function hackDatePage(pageUri) {
+    const date = Number(/date\/([0-9]+)/.exec(pageUri)[1]);
+    let h3 = qs('#person_birth h3');
+    h3.insertBefore(sparqlLink(personBirthQuery(date)), h3.firstChild);
+    h3 = qs('#person_death h3');
+    h3.insertBefore(sparqlLink(personDeathQuery(date)), h3.firstChild);
+    h3 = qs('#org_start h3');
+    h3.insertBefore(sparqlLink(orgStartQuery(date)), h3.firstChild);
+    h3 = qs('#org_stop h3');
+    h3.insertBefore(sparqlLink(orgStopQuery(date)), h3.firstChild);
+    h3 = qs('#work_start h3');
+    h3.insertBefore(sparqlLink(workStartQuery(date)), h3.firstChild);
+    h3 = qs('#work_stop h3');
+    h3.insertBefore(sparqlLink(workStopQuery(date)), h3.firstChild);
+    h3 = qs('#rameau_event h3');
+    h3.insertBefore(sparqlLink(subjectDateQuery(date)), h3.firstChild);
+    h3 = qs('#performances h3');
+    h3.insertBefore(sparqlLink(performanceDateQuery(date)), h3.firstChild);
+    h3 = qs('#publications h3');
+    h3.insertBefore(sparqlLink(publicationDateQuery(date)), h3.firstChild);
+}
+
+
+
 function hackHomePage() {
     const mapBlock = document.querySelector('#map-geo');
     insertBefore(sparqlLink(placesQuery()), mapBlock);
@@ -622,7 +859,7 @@ function hideModal() {
 
 try {
     let permalink = document.querySelector('link[rel=bookmark]'),
-        pageUri = (permalink === null) ? null : permalink.href;
+        pageUri = (permalink === null) ? document.location.pathname : permalink.href;
 
     switch(guessPageType()) {
     case 'author':
@@ -643,6 +880,9 @@ try {
     case 'performance':
         hackPerformancePage(pageUri);
         break;
+    case 'date':
+        hackDatePage(pageUri);
+        break
     case 'home':
         if (document.location.pathname === '/') {
             hackHomePage();
